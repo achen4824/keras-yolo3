@@ -5,7 +5,9 @@ from utils.bbox import draw_boxes
 from keras import Model
 from requests.auth import HTTPDigestAuth
 
-def startHTTP(input_path:str, infer_model:Model, net_h:int, net_w:int, config:json, obj_thresh:float, nms_thresh:float) -> None:
+
+# Get image from IP camera often requires username and password ex. http://192.168.1.xxx/ISAPI/Streaming/channels/101/picture
+def startHTTP(input_path:str, username:str, password:str, infer_model:Model, net_h:int, net_w:int, config:json, obj_thresh:float, nms_thresh:float) -> None:
     # the main loop
     batch_size  = 1
     images      = []
