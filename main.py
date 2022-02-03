@@ -5,6 +5,12 @@ import json
 from keras.models import load_model
 from httpStream import startHTTP
 from rtspStream import startRTSP
+import getpass
+
+# Taken from repo https://github.com/fbchat-dev/fbchat 
+# Needed some modifications for it to work though 
+from fbchat import Client
+from fbchat.models import Message
 
 def _main_(args):
     config_path  = args.conf
@@ -43,6 +49,12 @@ if __name__ == '__main__':
     argparser.add_argument('-i', '--input', help='path to rtsp or http stream')    
     argparser.add_argument('-u', '--username', help='username for http stream', required=False)
     argparser.add_argument('-p', '--password', help='password for http stream', required=False)
+
+    # # facebook user credentials
+    # # login
+    # client = Client(username, password)
+    # client.sendMessage("HelloThere", thread_id=client.uid)
+    # client.logout()
 
     args = argparser.parse_args()
     _main_(args)
