@@ -57,18 +57,26 @@ def bbox_iou(box1, box2):
     return float(intersect) / union
 
 def draw_boxes(image, boxes, labels, obj_thresh, quiet=True):
+    num_boxes = [0, 0, 0]
     for box in boxes:
         label_str = ''
         label = -1
         
         for i in range(len(labels)):
-            if box.classes[i] > obj_thresh:
+            if box.classes[i] > obj_thresh and (labels[i] == "person" or labels[i] == "pottedplant" or labels[i] == "dog"):
                 if label_str != '': label_str += ', '
                 label_str += (labels[i] + ' ' + str(round(box.get_score()*100, 2)) + '%')
                 label = i
-            if not quiet: print(label_str)
-                
+            if not quiet: print(label_str)  
+
         if label >= 0:
+            if labels[label] == "person":
+                num_boxes[0] += 1
+            elif labels[label] == "pottedplant":
+                num_boxes[1] += 1
+            elif labels[label] == "dog":
+                num_boxes[2] += 1
+
             text_size = cv2.getTextSize(label_str, cv2.FONT_HERSHEY_SIMPLEX, 1.1e-3 * image.shape[0], 5)
             width, height = text_size[0][0], text_size[0][1]
             region = np.array([[box.xmin-3,        box.ymin], 
@@ -86,4 +94,4 @@ def draw_boxes(image, boxes, labels, obj_thresh, quiet=True):
                         color=(0,0,0), 
                         thickness=2)
         
-    return image          
+    return image, num_boxes          

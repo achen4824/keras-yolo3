@@ -5,15 +5,29 @@ from utils.bbox import draw_boxes
 from keras import Model
 from requests.auth import HTTPDigestAuth
 
+# Taken from repo https://github.com/fbchat-dev/fbchat 
+# Needed some modifications for it to work though 
+from fbchat import Client
+from fbchat.models import Message
+
+def loginFacebook(auth : json) -> Client:
+    # # facebook user credentials
+    # # login
+    client = Client(auth["facebook"]["username"], auth["facebook"]["password"])
+    client.sendMessage("HelloThere", thread_id=client.uid)
+    return client
 
 # Get image from IP camera often requires username and password ex. http://192.168.1.xxx/ISAPI/Streaming/channels/101/picture
-def startHTTP(input_path:str, username:str, password:str, infer_model:Model, net_h:int, net_w:int, config:json, obj_thresh:float, nms_thresh:float) -> None:
+def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:int, config:json, obj_thresh:float, nms_thresh:float) -> None:
     # the main loop
     batch_size  = 1
     images      = []
 
     session = requests.Session()
-    session.auth = HTTPDigestAuth(username, password)
+    session.auth = HTTPDigestAuth(auth["http"]["username"], auth["http"]["password"])
+    
+    # Login Facebook
+    client = loginFacebook()
 
 
     while True:
@@ -26,11 +40,20 @@ def startHTTP(input_path:str, username:str, password:str, infer_model:Model, net
 
         if (len(images)==batch_size) or (len(images)>0):
             batch_boxes = get_yolo_boxes(infer_model, images, net_h, net_w, config['model']['anchors'], obj_thresh, nms_thresh)
-
+            
             for i in range(len(images)):
-                draw_boxes(images[i], batch_boxes[i], config['model']['labels'], obj_thresh) 
+                ret_image, num_boxes = draw_boxes(images[i], batch_boxes[i], config['model']['labels'], obj_thresh) 
                 cv2.imshow('video with bboxes', images[i])
+                
+                if sum(num_boxes) == 0:
+                    filename = f'image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
+                    cv2.imwrite(filename)
+                    client.sendImage(filename, message=f'Detected@{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)')
+
+
             images = []
         if cv2.waitKey(1) == 27: 
             break  # esc to quit
-        time.sleep(0.2)
+        time.sleep(30)
+
+

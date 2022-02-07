@@ -5,15 +5,11 @@ import json
 from keras.models import load_model
 from httpStream import startHTTP
 from rtspStream import startRTSP
-import getpass
 
-# Taken from repo https://github.com/fbchat-dev/fbchat 
-# Needed some modifications for it to work though 
-from fbchat import Client
-from fbchat.models import Message
 
 def _main_(args):
     config_path  = args.conf
+    auth_path    = args.auth
     input_path   = args.input
     username     = args.username
     password     = args.password
@@ -21,6 +17,8 @@ def _main_(args):
     with open(config_path) as config_buffer:    
         config = json.load(config_buffer)
 
+    with open(auth_path) as auth_buffer:
+        auth = json.load(auth_buffer)
 
     # Yolov3 Parameters  
     net_h, net_w = 416, 416 # a multiple of 32, the smaller the faster
@@ -38,7 +36,7 @@ def _main_(args):
         if username == None or password == None:
             print('HTTP Stream requires a username or password')
             return
-        startHTTP(input_path, username, password, infer_model, net_h, net_w, config, obj_thresh, nms_thresh)
+        startHTTP(input_path, auth, infer_model, net_h, net_w, config, obj_thresh, nms_thresh)
 
 
 
@@ -47,14 +45,8 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='Predict with a trained yolo model')
     argparser.add_argument('-c', '--conf', help='path to configuration file')
     argparser.add_argument('-i', '--input', help='path to rtsp or http stream')    
-    argparser.add_argument('-u', '--username', help='username for http stream', required=False)
-    argparser.add_argument('-p', '--password', help='password for http stream', required=False)
+    argparser.add_argument('-a', '--auth', help='authetication file', required=False)
 
-    # # facebook user credentials
-    # # login
-    # client = Client(username, password)
-    # client.sendMessage("HelloThere", thread_id=client.uid)
-    # client.logout()
 
     args = argparser.parse_args()
     _main_(args)
