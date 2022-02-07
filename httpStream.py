@@ -14,7 +14,11 @@ def loginFacebook(auth : json) -> Client:
     # # facebook user credentials
     # # login
     client = Client(auth["facebook"]["username"], auth["facebook"]["password"])
-    client.sendMessage("HelloThere", thread_id=client.uid)
+    # client.sendMessage("Service Initialized", thread_id=client.uid) Send to self
+    allFriends = client.fetchThreadList()
+    for friend in allFriends:
+        client.sendMessage("Service Initialized", thread_id=friend.uid)
+
     return client
 
 # Get image from IP camera often requires username and password ex. http://192.168.1.xxx/ISAPI/Streaming/channels/101/picture
@@ -43,17 +47,19 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
             
             for i in range(len(images)):
                 ret_image, num_boxes = draw_boxes(images[i], batch_boxes[i], config['model']['labels'], obj_thresh) 
-                cv2.imshow('video with bboxes', images[i])
+                # cv2.imshow('video with bboxes', images[i])
                 
-                if sum(num_boxes) == 0:
-                    filename = f'image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
+                if sum(num_boxes) > 0:
+                    filename = f'images/image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
                     cv2.imwrite(filename, images[i])
-                    client.sendImage(filename, message=f'Detected@{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)', thread_id=client.uid)
+                    allFriends = client.fetchThreadList()
+                    for friend in allFriends:
+                        client.sendLocalFiles([filename], message=f'Detected@RoseTce\n{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)', thread_id=friend.uid)
+                    time.sleep(3)
 
             images = []
-        break
         if cv2.waitKey(1) == 27: 
             break  # esc to quit
-        time.sleep(30)
+        time.sleep(0.2)
 
 
