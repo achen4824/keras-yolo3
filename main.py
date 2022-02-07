@@ -11,8 +11,6 @@ def _main_(args):
     config_path  = args.conf
     auth_path    = args.auth
     input_path   = args.input
-    username     = args.username
-    password     = args.password
 
     with open(config_path) as config_buffer:    
         config = json.load(config_buffer)
