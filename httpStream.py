@@ -54,7 +54,7 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
                     cv2.imwrite(filename, images[i])
                     allFriends = client.fetchThreadList()
                     for friend in allFriends:
-                        client.sendLocalFiles([filename], message=f'Detected@RoseTce\n{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)', thread_id=friend.uid)
+                        client.sendLocalFiles([filename], message=f'Detected@{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)', thread_id=friend.uid)
                     time.sleep(3)
 
             images = []
