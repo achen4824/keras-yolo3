@@ -1,4 +1,4 @@
-import json
+import json, signal, sys
 import imageio, requests, time, cv2, io
 from utils.utils import get_yolo_boxes
 from utils.bbox import draw_boxes
@@ -33,6 +33,14 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
     # Login Facebook
     client = loginFacebook(auth)
 
+    # Handle Termination
+    def signal_handler(sig, frame):
+        allFriends = client.fetchThreadList()
+        for friend in allFriends:
+            client.sendMessage("Service Terminated", thread_id=friend.uid)
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     while True:
         response = session.get(input_path)
@@ -53,8 +61,12 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
                     filename = f'images/image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
                     cv2.imwrite(filename, images[i])
                     allFriends = client.fetchThreadList()
+
+                    person_str = '\n{num_boxes[0]} person(s)' if num_boxes[0] > 0 else ''
+                    dog_str    = '\n{num_boxes[1]} dog(s)' if num_boxes[1] > 0 else ''
+
                     for friend in allFriends:
-                        client.sendLocalFiles([filename], message=f'{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[1]} dog(s)', thread_id=friend.uid)
+                        client.sendLocalFiles([filename], message=f'{time.strftime("%Y-%m-%d-%H:%M")}{person_str}{dog_str}', thread_id=friend.uid)
                     time.sleep(15)
 
             images = []
