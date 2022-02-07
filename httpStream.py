@@ -27,7 +27,7 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
     session.auth = HTTPDigestAuth(auth["http"]["username"], auth["http"]["password"])
     
     # Login Facebook
-    client = loginFacebook()
+    client = loginFacebook(auth)
 
 
     while True:
@@ -47,11 +47,11 @@ def startHTTP(input_path:str, auth : json, infer_model:Model, net_h:int, net_w:i
                 
                 if sum(num_boxes) == 0:
                     filename = f'image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
-                    cv2.imwrite(filename)
-                    client.sendImage(filename, message=f'Detected@{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)')
-
+                    cv2.imwrite(filename, images[i])
+                    client.sendImage(filename, message=f'Detected@{time.strftime("%Y-%m-%d-%H:%M")}\n{num_boxes[0]} person(s)\n{num_boxes[2]} dog(s)', thread_id=client.uid)
 
             images = []
+        break
         if cv2.waitKey(1) == 27: 
             break  # esc to quit
         time.sleep(30)

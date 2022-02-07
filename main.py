@@ -31,7 +31,7 @@ def _main_(args):
     if 'rtsp' in input_path:
         startRTSP(input_path, infer_model, net_h, net_w, config, obj_thresh, nms_thresh)
     elif 'http' in input_path:
-        if username == None or password == None:
+        if auth == None:
             print('HTTP Stream requires a username or password')
             return
         startHTTP(input_path, auth, infer_model, net_h, net_w, config, obj_thresh, nms_thresh)
