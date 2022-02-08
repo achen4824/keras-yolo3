@@ -57,7 +57,7 @@ def bbox_iou(box1, box2):
     return float(intersect) / union
 
 def draw_boxes(image, boxes, labels, obj_thresh, quiet=True):
-    num_boxes = [0, 0]
+    counter = dict({"person": 0, "dog": 0})
     for box in boxes:
         label_str = ''
         label = -1
@@ -71,9 +71,9 @@ def draw_boxes(image, boxes, labels, obj_thresh, quiet=True):
 
         if label >= 0:
             if labels[label] == "person":
-                num_boxes[0] += 1
+                counter["person"] += 1
             elif labels[label] == "dog":
-                num_boxes[1] += 1
+                counter["dog"] += 1
 
             text_size = cv2.getTextSize(label_str, cv2.FONT_HERSHEY_SIMPLEX, 1.1e-3 * image.shape[0], 5)
             width, height = text_size[0][0], text_size[0][1]
@@ -92,4 +92,4 @@ def draw_boxes(image, boxes, labels, obj_thresh, quiet=True):
                         color=(0,0,0), 
                         thickness=2)
         
-    return image, num_boxes          
+    return image, counter          
