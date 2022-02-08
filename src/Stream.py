@@ -1,4 +1,3 @@
-from pyexpat import model
 from keras import Model
 from keras.models import load_model
 import logging
@@ -8,7 +7,7 @@ import logging
 class Stream:
 
     def __init__(self, config):
-        self._infer_model :Model = load_model(config['train']['saved_weights_name'], compile=False)
+        self._infer_model:Model = load_model(config['train']['saved_weights_name'], compile=False)
         self._net_h = 416 
         self._net_w = 416
         self._obj_thresh = 0.95
@@ -18,7 +17,7 @@ class Stream:
 
         # Create logger
         self._logger = logging.getLogger('HTTPStream')
-        self._logger.setLevel(logging.INFO)
+        self._logger.setLevel(logging.ERROR)
         handler = logging.StreamHandler()
         handler.setFormatter(logging.Formatter('%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s'))
         self._logger.addHandler(handler)

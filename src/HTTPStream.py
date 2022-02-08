@@ -1,5 +1,5 @@
 import imageio, requests, time, cv2, io, json, sys
-from Stream import Stream
+from src.Stream import Stream
 from lib.utils.utils import get_yolo_boxes
 from lib.utils.bbox import draw_boxes
 from requests.auth import HTTPDigestAuth
@@ -68,7 +68,7 @@ class HTTPStream(Stream):
 
 
 
-    def _dict_to_string(dictionary:dict(str,int)) -> str:
+    def _dict_to_string(self, dictionary:dict) -> str:
         """Converts the dict of classes with their box count into a human-readable string
 
         Args:
@@ -122,7 +122,7 @@ class HTTPStream(Stream):
             self._logger.error("Authenticate Method must be run first to setup credentials")
             sys.exit(1)
 
-        fps:float = 5
+        fps:float = 1
 
         while True:
             image_status, image = self._getImage()
@@ -138,7 +138,7 @@ class HTTPStream(Stream):
 
                 ret_image, box_dict = draw_boxes(image, batch_boxes[0], self._config['model']['labels'], self._obj_thresh)
 
-                if sum(list(box_dict.values)) > 0:
+                if sum(list(box_dict.values())) > 0:
                     filename = f'images/image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
                     cv2.imwrite(filename, image)
                     self._sendFBFile(filename, message=f'{time.strftime("%Y-%m-%d-%H:%M")}{self._dict_to_string(box_dict)}')
