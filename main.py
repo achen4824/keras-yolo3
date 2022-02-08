@@ -3,8 +3,7 @@ import os
 import argparse
 import json
 from keras.models import load_model
-from src.HTTPStream import startHTTP
-from src.RTSPStream import startRTSP
+from src.HTTPStream import HTTPStream
 
 
 def _main_(args):
@@ -21,13 +20,10 @@ def _main_(args):
     # Initialize Model from Saved file
     os.environ['CUDA_VISIBLE_DEVICES'] = config['train']['gpus']
 
-    if 'rtsp' in input_path:
-        startRTSP(input_path)
-    elif 'http' in input_path:
-        if auth == None:
-            print('HTTP Stream requires a username or password')
-            return
-        startHTTP(input_path, auth,  config)
+    stream = HTTPStream(config)
+    stream.verify(input_path)
+    stream.authenticate(auth)
+    stream.start()
         
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='Predict with a trained yolo model')
