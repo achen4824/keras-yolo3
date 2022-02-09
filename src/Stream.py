@@ -17,7 +17,7 @@ class Stream:
 
         # Create logger
         self._logger = logging.getLogger('HTTPStream')
-        self._logger.setLevel(logging.ERROR)
+        self._logger.setLevel(logging.INFO)
         handler = logging.StreamHandler()
         handler.setFormatter(logging.Formatter('%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s'))
         self._logger.addHandler(handler)

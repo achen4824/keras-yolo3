@@ -6,9 +6,9 @@ from src.HTTPStream import HTTPStream
 
 
 def _main_():
-    config_path  = os.environ("CONFIG_FILE")
-    auth_path    = os.environ("CREDENTIAL_FILE")
-    input_path   = os.environ("HTTP_URL")
+    config_path  = os.environ.get("CONFIG_FILE")
+    auth_path    = os.environ.get("CREDENTIAL_FILE")
+    input_path   = os.environ.get("HTTP_URL")
 
     with open(config_path) as config_buffer:
         config = json.load(config_buffer)
