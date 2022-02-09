@@ -34,6 +34,7 @@ class HTTPStream(Stream):
         Args:
             auth (json): A json with the authetication details
         """
+        self._auth = auth
         self._client:Client = Client(auth["facebook"]["username"], auth["facebook"]["password"])
 
         self._session:Session = requests.Session()
@@ -41,6 +42,9 @@ class HTTPStream(Stream):
 
         self._authenticated:bool = True
 
+    def _keep_login(self):
+        if not self._client.isLoggedIn():
+            self._client.login(self.auth["facebook"]["username"], self.auth["facebook"]["password"])
 
 
     def _sendFBMessage(self, message:str) -> None:
@@ -139,6 +143,7 @@ class HTTPStream(Stream):
                 ret_image, box_dict = draw_boxes(image, batch_boxes[0], self._config['model']['labels'], self._obj_thresh)
 
                 if sum(list(box_dict.values())) > 0:
+                    self._keep_login()
                     filename = f'images/image-{time.strftime("%Y-%m-%d-%H:%M")}.png'
                     cv2.imwrite(filename, image)
                     self._sendFBFile(filename, message=f'{time.strftime("%Y-%m-%d-%H:%M")}{self._dict_to_string(box_dict)}')
